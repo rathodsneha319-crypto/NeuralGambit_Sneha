@@ -100,7 +100,7 @@ int main() {
 
         if (token == "uci") {
             std::cout << "id name NeuralGambit\n";
-            std::cout << "id author vishalpatel04\n";
+            std::cout << "id author SnehaRathod\n";
             std::cout << "uciok\n" << std::flush;
         } else if (token == "isready") {
             std::cout << "readyok\n" << std::flush;
