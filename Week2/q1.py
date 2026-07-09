@@ -73,45 +73,87 @@ class History:
                 board[self.history[i]] = 'o'
         return board
 
-    def get_winner(self):
-        """ Helper: returns 'x' or 'o' if that player has three in a row, else None. """
-        b = self.board
-        lines = [(0, 1, 2), (3, 4, 5), (6, 7, 8),
-                 (0, 3, 6), (1, 4, 7), (2, 5, 8),
-                 (0, 4, 8), (2, 4, 6)]
-        for i, j, k in lines:
-            if b[i] != '0' and b[i] == b[j] == b[k]:
-                return b[i]
-        return None
-
     def is_win(self):
-        # check if the board position is a win for either players
-        return self.get_winner() is not None
+        win=[
+
+    [0, 1, 2],
+
+    [3, 4, 5],
+
+    [6, 7, 8],
+
+    [0, 3, 6],
+
+    [1, 4, 7],
+
+    [2, 5, 8],
+
+    [0, 4, 8],
+
+    [2, 4, 6]
+
+]
+        board = self.get_board()
+        Result='n'
+        for i in range(0,7):
+            if(board[win[i][0]]==board[win[i][1]] and board[win[i][0]]==board[win[i][2]]):
+                Result=board[win[i][1]]
+                break
+        return Result
 
     def is_draw(self):
-        # check if the board position is a draw
-        return self.get_winner() is None and '0' not in self.board
+        win=[
+
+    [0, 1, 2],
+
+    [3, 4, 5],
+
+    [6, 7, 8],
+
+    [0, 3, 6],
+
+    [1, 4, 7],
+
+    [2, 5, 8],
+
+    [0, 4, 8],
+
+    [2, 4, 6]
+
+]
+        board = self.get_board()
+        Result=True
+        for i in range(0,7):
+            if(board[win[i][0]]==board[win[i][1]] and board[win[i][0]]==board[win[i][2]]):
+                Result=False
+                break
+        return Result
 
     def get_valid_actions(self):
-        # get the empty squares from the board
         return [i for i in range(9) if self.board[i] == '0']
 
     def is_terminal_history(self):
-        # check if the history is a terminal history
-        return self.is_win() or self.is_draw()
-
+        isWin=self.is_win()
+        if(isWin !='n'):
+            return True
+        else:
+            isDraw=self.is_draw()
+            if(isDraw):
+                return True
+        return False
+        
     def get_utility_given_terminal_history(self):
-        winner = self.get_winner()
-        if winner == 'x':
+        isWin=self.is_win()
+        if(isWin =='x'):
             return 1
-        elif winner == 'o':
+        elif(isWin =='o'):
             return -1
         else:
             return 0
 
     def update_history(self, action):
-        # In case you need to create a deepcopy and update the history obj to get the next history object.
-        return History(history=self.history + [action])
+      new_history = self.history + [action]
+      return History(new_history)
 
 
 def backward_induction(history_obj):
@@ -120,39 +162,21 @@ def backward_induction(history_obj):
     :return: best achievable utility (float) for th current history_obj
     """
     global strategy_dict_x, strategy_dict_o
-
-    # Base case: terminal history, utility is just read off the board.
-    if history_obj.is_terminal_history():
-        return history_obj.get_utility_given_terminal_history()
-
-    player = history_obj.player
-    valid_actions = history_obj.get_valid_actions()
-
-    # Recurse on every child history to get its backward-induction value.
-    action_values = {}
-    for action in valid_actions:
-        child = history_obj.update_history(action)
-        action_values[action] = backward_induction(child)
-
-    # 'x' maximizes utility (utility is defined w.r.t. x), 'o' minimizes it.
-    if player == 'x':
-        best_value = max(action_values.values())
-    else:
-        best_value = min(action_values.values())
-
-    # Pick (any) one of the optimal actions -> deterministic SPE strategy.
-    best_action = min(a for a, v in action_values.items() if v == best_value)
-
-    strategy = {str(a): 0.0 for a in range(9)}
-    strategy[str(best_action)] = 1.0
-
-    key = ''.join(str(a) for a in history_obj.history)
-    if player == 'x':
-        strategy_dict_x[key] = strategy
-    else:
-        strategy_dict_o[key] = strategy
-
-    return best_value
+    # TODO implement
+    # (1) Implement backward induction for tictactoe
+    # (2) Update the global variables strategy_dict_x or strategy_dict_o which are a mapping from histories to
+    # probability distribution over actions.
+    # (2a)These are dictionary with keys as string representation of the history list e.g. if the history list of the
+    # history_obj is [0, 4, 2, 5], then the key is "0425". Each value is in turn a dictionary with keys as actions 0-8
+    # (str "0", "1", ..., "8") and each value of this dictionary is a float (representing the probability of
+    # choosing that action). Example: {”0452”: {”0”: 0, ”1”: 0, ”2”: 0, ”3”: 0, ”4”: 0, ”5”: 0, ”6”: 1, ”7”: 0, ”8”:
+    # 0}}
+    # (2b) Note, the strategy for each history in strategy_dict_x and strategy_dict_o is probability distribution over
+    # actions. But since tictactoe is a PIEFG, there always exists an optimal deterministic strategy (SPNE). So your
+    # policy will be something like this {"0": 1, "1": 0, "2": 0, "3": 0, "4": 0, "5": 0, "6": 0, "7": 0, "8": 0} where
+    # "0" was the one of the best actions for the current player/history.
+    return -2
+    # TODO implement
 
 
 def solve_tictactoe():
